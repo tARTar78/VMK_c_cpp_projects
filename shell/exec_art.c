@@ -11,8 +11,8 @@ void addzomb(pid_t pid){
 
 }
 
-zomb_t* z_list;
-int zomb_count = NULL;
+zomb_t* z_list = NULL;
+int zomb_count;
 
 tree t_ex = NULL;
 
