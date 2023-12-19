@@ -16,6 +16,9 @@ jobs:
     - name: make
       run: make
       working-directory: ./shell
+    - name: make chmod
+      run: chmod +x make_tests.sh
+      working-directory: ./shell
     - name: make tests
       run: ./make_tests.sh
       working-directory: ./shell
