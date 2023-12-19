@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#ifndef EXEC_ART_H
+#define EXEC_ART_H
 jmp_buf ebuf;
 typedef struct zombie_str{
 
@@ -23,3 +25,5 @@ int zomb_count;
 void execute(tree t);
 void print_zomb();
 void kill_zomb();
+
+#endif
