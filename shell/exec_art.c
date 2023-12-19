@@ -11,6 +11,9 @@ void addzomb(pid_t pid){
 
 }
 
+zomb_t* z_list;
+int zomb_count = NULL;
+
 tree t_ex = NULL;
 
 void print_zomb(){
