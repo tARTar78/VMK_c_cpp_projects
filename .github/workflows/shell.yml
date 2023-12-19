@@ -16,3 +16,6 @@ jobs:
     - name: make
       run: make
       working-directory: ./shell
+    - name: make tests
+      run: ./make_tests.sh
+      working-directory: ./shell
