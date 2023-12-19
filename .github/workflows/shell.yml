@@ -22,3 +22,8 @@ jobs:
     - name: make tests
       run: ./make_tests.sh
       working-directory: ./shell
+    - name: make chmod2
+      run: chmod +x tests.sh
+    - name: tests
+      run: ./tests.sh
+      working-directory: ./shell
