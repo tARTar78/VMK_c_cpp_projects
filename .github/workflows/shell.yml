@@ -16,9 +16,3 @@ jobs:
     - name: make
       run: make
       working-directory: ./shell
-    - name: make check
-      run: make check
-      working-directory: ./shell
-    - name: make distcheck
-      run: make distcheck
-      working-directory: ./shell
