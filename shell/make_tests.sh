@@ -12,9 +12,9 @@ index=0
 # Перебор команд в массиве
 for command in "${commands[@]}"; do
   # Имя файла для записи вывода
-  output_file="/tmp1/test${index}_expected_output.txt"
+  output_file="tmp1/test${index}_expected_output.txt"
   # Имя файла для записи команды
-  command_file="/tmp1/test${index}_input.txt"
+  command_file="tmp1/test${index}_input.txt"
 
   # Запись команды в файл
   echo "${command} ; exit" > "$command_file"
