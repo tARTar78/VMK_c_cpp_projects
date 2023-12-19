@@ -19,8 +19,8 @@ typedef struct zombie_str{
 
 }zomb_t;
 
-zomb_t* z_list;
-int zomb_count;
+extern zomb_t* z_list;
+extern int zomb_count;
 
 void execute(tree t);
 void print_zomb();
