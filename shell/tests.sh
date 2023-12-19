@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "Running test 1..."
-./shell_art < /tmp/test0_input.txt > /tmp/test0_output.txt
-if diff -q /tmp/test0_expected_output.txt /tmp/test0_output.txt
+./shell_art < /tmp1/test0_input.txt > /tmp1/test0_output.txt
+if diff -q /tmp1/test0_expected_output.txt /tmp1/test0_output.txt
 then
     echo "Test 1 passed"
 else
