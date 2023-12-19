@@ -11,7 +11,7 @@
 
 #ifndef EXEC_ART_H
 #define EXEC_ART_H
-jmp_buf ebuf;
+extern jmp_buf ebuf;
 typedef struct zombie_str{
 
 	pid_t pidz;
