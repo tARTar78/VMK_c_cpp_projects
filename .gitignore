@@ -1,1 +1,3 @@
 shell/shell_art
+shell/tmp/*_output.txt
+shell/tmp/*_clean.txt
