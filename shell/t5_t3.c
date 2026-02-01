@@ -280,7 +280,7 @@ void newline(){
 void stop(){
 	if(check_eof == 1){
                 exit(0);
-		
+
 	}
 	k = 0;
 	if(check_lst() || kav == 1){
@@ -294,10 +294,21 @@ void stop(){
 		return;
 	}
         change_env(envp_art,"$SHELL");
-	strcpy(envp_art,getenv("HOME"));
-	change_env(envp_art,"$HOME");
-	strcpy(envp_art, getlogin());
-	change_env(envp_art,"$USER");
+
+	const char* home_env = getenv("HOME");
+	if (home_env) {
+		strncpy(envp_art, home_env, BUFSIZ - 1);
+		envp_art[BUFSIZ - 1] = '\0';
+		change_env(envp_art,"$HOME");
+	}
+
+	const char* login = getlogin();
+	if (login) {
+		strncpy(envp_art, login, BUFSIZ - 1);
+		envp_art[BUFSIZ - 1] = '\0';
+		change_env(envp_art,"$USER");
+	}
+
 	snprintf(envp_art,BUFSIZ,"%d",geteuid());
 	change_env(envp_art,"$EUID");
 	//printlist();
