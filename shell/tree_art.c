@@ -1,11 +1,21 @@
+#define _POSIX_C_SOURCE 200809L
 #include "tree_art.h"
 #include "list.h"
+
 extern char** lst;
 extern int syntax;
 int cur = 0;
-tree make_cmd(); /* создает дерево из одного элемента, обнуляет все поля */
+
+/* Forward declarations */
+tree make_cmd(void);  /* создает дерево из одного элемента, обнуляет все поля */
 void make_bgrnd(tree t); /* устанавливает поле backgrnd=1 во всех командах конвейера t */
-void add_arg();
+void add_arg(tree t, int i);
+
+/* Helper function to handle allocation failure */
+static void tree_alloc_error(const char* func_name) {
+    fprintf(stderr, "Memory allocation failed in %s\n", func_name);
+    exit(1);
+}
 
 
 void clear_tree(tree t){
@@ -212,10 +222,8 @@ tree build_tree(char** lst){
 				G = conv;
 				continue;
 			case in:
-
-				c->infile = malloc(256*sizeof(char));
-				strcpy(c->infile,lst[cur]);
-				printf("%s\n",lst[cur]);
+				c->infile = strdup(lst[cur]);
+				if (!c->infile) tree_alloc_error("build_tree:in");
 				G = in1;
 				cur--;
 				continue;
@@ -223,8 +231,8 @@ tree build_tree(char** lst){
 				G = conv;
 				continue;
 			case out:
-				c->outfile = malloc(256*sizeof(char));
-				strcpy(c->outfile,lst[cur]);
+				c->outfile = strdup(lst[cur]);
+				if (!c->outfile) tree_alloc_error("build_tree:out");
 				G = out1;
 				cur--;
 				continue;
@@ -285,12 +293,9 @@ void make_bgrnd(tree t)
 
 }
 
-tree make_cmd(){
-	//printf("{art}\n");
-	 //fflush(stdout);
+tree make_cmd(void){
 	tree res = malloc(sizeof(struct cmd_inf));
-	 //printf("{art} : %s\n",lst[i]);
-         //fflush(stdout);
+	if (!res) tree_alloc_error("make_cmd");
 
 	res->argv = NULL;
 	res->backgrnd = 0;
@@ -298,29 +303,27 @@ tree make_cmd(){
 	res->outfile = NULL;
 	res->append = 0;
 	res->psubcmd = NULL;
-	//res->pipe = NULL;
 	res->next = NULL;
 	return res;
-
-
 }
 
 void add_arg(tree t, int i){
 	if(t->argv == NULL){
-		//printf("%s", lst[i]);
-		//fflush(stdout);
-		t->argv = calloc(256,sizeof(char*));
-		(t->argv)[0] = malloc(256*sizeof(char));
-		strcpy((t->argv)[0],lst[i]);
+		t->argv = calloc(MAX_ARGS, sizeof(char*));
+		if (!t->argv) tree_alloc_error("add_arg:calloc");
+		t->argv[0] = strdup(lst[i]);
+		if (!t->argv[0]) tree_alloc_error("add_arg:strdup");
 	}else{
 		int c = 0;
-		while( (t->argv)[c] != NULL){
-			//printf("{%s}", (t->argv)[c]);
-			//fflush(stdout);
+		while(t->argv[c] != NULL){
 			c++;
 		}
-		(t->argv)[c] = malloc(256 * sizeof(char));
-                strcpy((t->argv)[c],lst[i]);
+		if (c >= MAX_ARGS - 1) {
+			fprintf(stderr, "Too many arguments (max %d)\n", MAX_ARGS - 1);
+			return;
+		}
+		t->argv[c] = strdup(lst[i]);
+		if (!t->argv[c]) tree_alloc_error("add_arg:strdup");
 	}
 }
 

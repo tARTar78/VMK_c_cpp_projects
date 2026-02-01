@@ -1,14 +1,14 @@
 #include "exec_art.h"
 
-//extern jmp_buf ebuf;
-
 void addzomb(pid_t pid){
 	zomb_t* zn = malloc(sizeof(zomb_t));
+	if (!zn) {
+		fprintf(stderr, "Memory allocation failed in addzomb\n");
+		return;
+	}
 	zn->pidz = pid;
 	zn->next = z_list;
-	z_list = zn;	
-
-
+	z_list = zn;
 }
 
 zomb_t* z_list = NULL;
@@ -34,6 +34,7 @@ void execute(tree t);
 int pipe_exec(tree t);
 int cd(int argc, char** argv);
 void proc(tree t, int back, pid_t pgid){
+	(void)pgid;  /* Currently unused, reserved for future job control */
 
 	if(back){
 		signal(SIGINT, SIG_IGN);
@@ -136,7 +137,7 @@ int pipe_exec(tree t){
 
 	}
 	tree c = t;
-	pid_t pid, pgid;
+	pid_t pid, pgid = 0;
 	int fd[2], fd_temp, stat = 0, frk = 0;
 	fd_temp = -1;
 	if(t->backgrnd){
