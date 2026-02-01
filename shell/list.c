@@ -2,12 +2,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "struct3.h"
-#define SIZE 16
+#include "list.h"
+
 int c;
 extern int syntax;
-char str[10];
-char str1[10];
+char str[INPUT_CHUNK_SIZE];
+char str1[INPUT_CHUNK_SIZE];
 char** lst;
 char* buf;
 int sizebuf;
@@ -16,23 +16,21 @@ int curbuf;
 int curlist;
 extern char* home;
 extern char* path_home;
+
+/* Helper function to handle allocation failure */
+static void alloc_error(const char* func_name) {
+    fprintf(stderr, "Memory allocation failed in %s\n", func_name);
+    exit(1);
+}
 void clearlist(){
-
-	int i;
-        sizelist=0;
-        curlist=0;
+        sizelist = 0;
+        curlist = 0;
         if (lst == NULL) return;
-        for(int i = 0; lst[i] != NULL; ++i){
-		//printf("%s\n",lst[i]);
-	
+        for(int i = 0; lst[i] != NULL; ++i) {
                 free(lst[i]);
-	
-	}
-
+        }
         free(lst);
         lst = NULL;
-
-
 }
 
 void null_list(){
@@ -43,11 +41,18 @@ void null_list(){
 
 void termlist(){
         if(lst==NULL) return;
-        if(curlist > sizelist-1)
-                lst=realloc(lst,(sizelist=curlist+1)*sizeof(*lst));
+        if(curlist > sizelist-1) {
+                char** tmp = realloc(lst, (curlist+1) * sizeof(*lst));
+                if (!tmp) alloc_error("termlist");
+                lst = tmp;
+                sizelist = curlist + 1;
+        }
 
         lst[curlist] = NULL;
-        lst = realloc(lst,(sizelist=curlist+1)*sizeof(*lst));
+        char** tmp = realloc(lst, (curlist+1) * sizeof(*lst));
+        if (!tmp) alloc_error("termlist");
+        lst = tmp;
+        sizelist = curlist + 1;
 }
 
 void nullbuf(){
@@ -57,72 +62,81 @@ void nullbuf(){
 
 }
 void addsym(){
-        if(curbuf>sizebuf-1)
-                buf = realloc(buf, sizebuf+=SIZE);
+        if(curbuf > sizebuf-1) {
+                char* tmp = realloc(buf, sizebuf + INPUT_CHUNK_SIZE);
+                if (!tmp) alloc_error("addsym");
+                buf = tmp;
+                sizebuf += INPUT_CHUNK_SIZE;
+        }
 
-        buf[curbuf++]=c;
-
+        buf[curbuf++] = c;
 }
 
 void addword(){
-        if (curbuf > sizebuf-1)
-                buf = realloc(buf, sizebuf+=1);
+        if (curbuf > sizebuf-1) {
+                char* tmp = realloc(buf, sizebuf + 1);
+                if (!tmp) alloc_error("addword");
+                buf = tmp;
+                sizebuf += 1;
+        }
 
-        buf[curbuf++]='\0';
-        buf=realloc(buf,sizebuf=curbuf);
+        buf[curbuf++] = '\0';
+        char* tmp = realloc(buf, curbuf);
+        if (!tmp) alloc_error("addword");
+        buf = tmp;
+        sizebuf = curbuf;
 
-        if(curlist>sizelist-1)
-                lst=realloc(lst, (sizelist+=SIZE)*sizeof(*lst));
-        lst[curlist++]=buf;
-
+        if(curlist > sizelist-1) {
+                char** tmp_lst = realloc(lst, (sizelist + INITIAL_LIST_SIZE) * sizeof(*lst));
+                if (!tmp_lst) alloc_error("addword");
+                lst = tmp_lst;
+                sizelist += INITIAL_LIST_SIZE;
+        }
+        lst[curlist++] = buf;
 }
 
 void printlist(){
-        int i;
         if(lst == NULL) return;
 
-        for(int i=0; i < sizelist-1;i++)
+        for(int i = 0; i < sizelist-1; i++) {
                 printf("%s\n", lst[i]);
+        }
 }
 int check_lst(){
-	int sc1 = 0, sc2 = 0, kav1 = 0, kav2 = 0;
-	int i;
+        int sc1 = 0, sc2 = 0, kav1 = 0;
         if(lst == NULL) return 0;
 
-        for(int i=0; i < sizelist-1;i++){
-                if(strcmp(lst[i],"(") == 0){
-                       sc1++;
+        for(int i = 0; i < sizelist-1; i++) {
+                if(strcmp(lst[i], "(") == 0) {
+                        sc1++;
                 }
-		if(strcmp(lst[i],")") == 0){
+                if(strcmp(lst[i], ")") == 0) {
                         sc2++;
                 }
-		if(strcmp(lst[i],"\"") == 0){
+                if(strcmp(lst[i], "\"") == 0) {
                         kav1++;
                 }
-		if((sc1 < sc2 )){
-			return 1;
-		}	
-	}
-	if((sc1 != sc2) || (kav1 % 2 == 1)){
-		return 1;
-	}
-	return 0;
-
-
-
+                if(sc1 < sc2) {
+                        return 1;
+                }
+        }
+        if((sc1 != sc2) || (kav1 % 2 == 1)) {
+                return 1;
+        }
+        return 0;
 }
-void change_env(char* str1,char* str2)
+void change_env(char* str1, char* str2)
 {
-	int i;
         if(lst == NULL) return;
 
-        for(int i=0; i < sizelist-1;i++)
-		if(strcmp(lst[i],str2 ) == 0){
-			lst[i] = realloc(lst[i],sizeof(char)*(strlen(str1) + 1));
-			strcpy(lst[i], str1);	
-		}
-	
-
+        for(int i = 0; i < sizelist-1; i++) {
+                if(strcmp(lst[i], str2) == 0) {
+                        char* tmp = realloc(lst[i], strlen(str1) + 1);
+                        if (!tmp) alloc_error("change_env");
+                        lst[i] = tmp;
+                        strcpy(lst[i], str1);
+                }
+        }
 }
 
 

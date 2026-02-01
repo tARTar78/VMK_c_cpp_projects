@@ -1,11 +1,22 @@
+#ifndef TREE_ART_H
+#define TREE_ART_H
+
+#define _POSIX_C_SOURCE 200809L
+
 #include "list.h"
 #include <stdlib.h>
 #include <setjmp.h>
 #include <string.h>
 #include <stdio.h>
 
+/* Maximum number of arguments per command */
+#define MAX_ARGS 256
+
+/* Path buffer size */
+#define PATH_BUF_SIZE 256
+
 enum type_of_next{
-    NXT, AND, OR, CONV   // виды связей соседних команд в списке команд
+    NXT, AND, OR, CONV   /* виды связей соседних команд в списке команд */
 };
 
 struct cmd_inf {
@@ -27,3 +38,4 @@ void print_tree(tree t, int i);
 tree build_tree(char** lst );
 void clear_tree(tree t);
 
+#endif /* TREE_ART_H */

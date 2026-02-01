@@ -4,15 +4,16 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "list.h"
-//#include "tree_art.h"
 #include "exec_art.h"
-#define SIZE 16
+
 extern int c;
 extern int cur;
-//jmp_buf ebuf;
+
 int syntax = 0;
-char mas[7] = {0,0,0,0,0,0,0};
+
+/* Special character counters: > < | & ; ( ) */
+#define SPECIAL_CHAR_COUNT 7
+char mas[SPECIAL_CHAR_COUNT] = {0,0,0,0,0,0,0};
 extern char str[10];
 extern char str1[10];
 int k = 0;
@@ -282,14 +283,15 @@ void stop(){
 		
 	}
 	k = 0;
-	//sortlist();
-	//strcpy(envp_art, getenv("SHELL"));
 	if(check_lst() || kav == 1){
-		printf("syntax error\n");
-                fflush(stdout);
-                clearlist();
-                return;
-
+		if (kav == 1) {
+			fprintf(stderr, "syntax error: unclosed quote\n");
+		} else {
+			fprintf(stderr, "syntax error: unmatched parentheses\n");
+		}
+		fflush(stderr);
+		clearlist();
+		return;
 	}
         change_env(envp_art,"$SHELL");
 	strcpy(envp_art,getenv("HOME"));
@@ -318,10 +320,13 @@ void stop(){
 }
 void child_wait(int code)
 {
+    (void)code;  /* Signal number not used */
     wait(NULL);
 }
 
 int main(int argc, char* argv[], char* envp[]){
+		(void)argc;
+		(void)envp;
 		setpgid(0,0);
 		zomb_count = 0;
 		signal(SIGINT, SIG_IGN);
